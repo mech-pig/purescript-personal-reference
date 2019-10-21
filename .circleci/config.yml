@@ -9,19 +9,13 @@ workflows:
 jobs:
   test:
     docker:
-      - image: circleci/node:10.15
+      - image: mechpig/purescript:wip
     working_directory: ~/repo
     steps:
       - checkout
-      - install-purescript:
-          name: Install purescript
-          command: npm install -g purescript@0.13.3
-      - install-spago:
-          name: Install spago
-          command: npm install -g spago
-      - install-dependencies:
+      - run:
           name: Install dependencies
           command: make install-dev
-      - run-unit-tests:
+      - run:
           name: Run unit tests
-          command: make test-unit
+          command: make test
