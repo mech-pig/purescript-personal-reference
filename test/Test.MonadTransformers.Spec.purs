@@ -12,6 +12,15 @@ spec :: Spec Unit
 spec =
   describe "Test.MonadTransformers" do
 
+    describe "Step" do
+
+      it "implements instance for Show" do
+        show Rest `shouldEqual` "Rest"
+        show (Move Up 123) `shouldEqual` "Move Up 123"
+        show (Move Right 123) `shouldEqual` "Move Right 123"
+        show (Move Down 123) `shouldEqual` "Move Down 123"
+        show (Move Left 123) `shouldEqual` "Move Left 123"
+
     describe "move" do
 
       it "returns origin if step is Rest" $
