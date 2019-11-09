@@ -1,6 +1,6 @@
 module MonadTransformers where
 
-import Prelude ((<>), ($), (+), (-), bind, discard, show, Unit)
+import Prelude ((<>), ($), (+), (-), class Show, bind, discard, show, Unit)
 
 import Control.Monad (class Monad)
 import Control.Monad.Reader.Class (class MonadReader, asks)
@@ -17,6 +17,13 @@ import Effect.Console (log)
 data Step = Move Direction Int | Rest
 
 data Direction = Up | Right | Left | Down
+
+instance showStep :: Show Step where
+  show (Rest) = "Rest"
+  show (Move Up d) = "Move Up " <> show d
+  show (Move Left d) = "Move Left " <> show d
+  show (Move Down d) = "Move Down " <> show d
+  show (Move Right d) = "Move Right " <> show d
 
 type Instructions = List Step
 
@@ -66,6 +73,6 @@ main = do
   let initialState = { currentPosition: { x: 0, y: 1 } }
   let configuration = { instructions: ((Move Up 3) : (Move Left 1) : Nil) }
   log $ "initialState:\n\t" <> show initialState
-  -- TODO(missing show instance for Step): log $ "configuration:\n\t" <> show configuration
+  log $ "configuration:\n\t" <> show configuration
   finalState <- runRoverProgram configuration initialState
   log $ "finalState:\n\t" <> show finalState
