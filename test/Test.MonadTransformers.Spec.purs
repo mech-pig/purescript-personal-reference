@@ -14,44 +14,96 @@ spec =
 
     describe "Step" do
 
-      it "implements instance for Show" do
-        show Rest `shouldEqual` "Rest"
-        show (Move Up 123) `shouldEqual` "Move Up 123"
-        show (Move Right 123) `shouldEqual` "Move Right 123"
-        show (Move Down 123) `shouldEqual` "Move Down 123"
-        show (Move Left 123) `shouldEqual` "Move Left 123"
+      let testStepShowInstance = (\desc input expected ->
+        it ("implements instance for Show (constructor: " <> desc <> ")") $
+          show input `shouldEqual` expected
+      )
+
+      testStepShowInstance "Rest" Rest "Rest"
+      testStepShowInstance "Move Up Distance" (Move Up 123) "Move Up 123"
+      testStepShowInstance "Move Right Distance" (Move Right 123) "Move Right 123"
+      testStepShowInstance "Move Down Distance" (Move Down 123) "Move Down 123"
+      testStepShowInstance "Move Left Distance" (Move Left 123) "Move Left 123"
+
 
     describe "move" do
 
-      it "returns origin if step is Rest" $
-        (move Rest { x:  0, y:  0 }) `shouldEqual` { x:  0, y:  0 }
+      let buildTestCase = (\origin step expectedPosition ->
+        move step origin `shouldEqual` expectedPosition
+      )
 
-      it "returns origin if step is a Move in any direction and distance = 0" do
-        (move (Move Up     0) { x:  0, y:  0 }) `shouldEqual` { x:  0, y:  0 }
-        (move (Move Right  0) { x:  0, y:  0 }) `shouldEqual` { x:  0, y:  0 }
-        (move (Move Down   0) { x:  0, y:  0 }) `shouldEqual` { x:  0, y:  0 }
-        (move (Move Left   0) { x:  0, y:  0 }) `shouldEqual` { x:  0, y:  0 }
+      let testRestStepReturnsOrigin = (\origin ->
+        it ("returns origin if step is Rest (origin: " <> show origin <> ")") $
+          buildTestCase origin Rest origin
+      )
 
-      it "translates origin if step is a Move in any direction and distance ≠ 0" do
-        (move (Move Up      1) { x:  0, y:  0 }) `shouldEqual` { x:  0, y:  1 }
-        (move (Move Up   (-1)) { x:  0, y:  0 }) `shouldEqual` { x:  0, y: -1 }
-        (move (Move Up      2) { x:  0, y:  0 }) `shouldEqual` { x:  0, y:  2 }
-        (move (Move Up      1) { x:  1, y:  2 }) `shouldEqual` { x:  1, y:  3 }
+      testRestStepReturnsOrigin { x:  0, y:  0 }
+      testRestStepReturnsOrigin { x:  0, y:  1 }
+      testRestStepReturnsOrigin { x:  1, y:  0 }
+      testRestStepReturnsOrigin { x:  1, y:  1 }
+      testRestStepReturnsOrigin { x: -1, y: -1 }
+      testRestStepReturnsOrigin { x:  0, y: -1 }
 
-        (move (Move Right    1) { x:  0, y:  0 }) `shouldEqual` { x:  1, y:  0 }
-        (move (Move Right (-1)) { x:  0, y:  0 }) `shouldEqual` { x: -1, y:  0 }
-        (move (Move Right    2) { x:  0, y:  0 }) `shouldEqual` { x:  2, y:  0 }
-        (move (Move Right    1) { x:  1, y:  2 }) `shouldEqual` { x:  2, y:  2 }
+      let testReturnsOriginIfMoveOfDistanceZero = (\origin step ->
+        it (
+          "returns origin if step is a Move with distance = 0 (step: "
+            <> show step <> ", origin: " <> show origin <> ")"
+        ) $ buildTestCase origin step origin
+      )
 
-        (move (Move Down     1) { x:  0, y:  0 }) `shouldEqual` { x:  0, y: -1 }
-        (move (Move Down  (-1)) { x:  0, y:  0 }) `shouldEqual` { x:  0, y:  1 }
-        (move (Move Down     2) { x:  0, y:  0 }) `shouldEqual` { x:  0, y: -2 }
-        (move (Move Down     1) { x:  1, y:  2 }) `shouldEqual` { x:  1, y:  1 }
+      testReturnsOriginIfMoveOfDistanceZero { x:  0, y:  0 } (Move Up    0)
+      testReturnsOriginIfMoveOfDistanceZero { x:  0, y:  1 } (Move Up    0)
+      testReturnsOriginIfMoveOfDistanceZero { x:  1, y:  0 } (Move Up    0)
+      testReturnsOriginIfMoveOfDistanceZero { x:  1, y:  1 } (Move Up    0)
+      testReturnsOriginIfMoveOfDistanceZero { x: -1, y:  0 } (Move Up    0)
+      testReturnsOriginIfMoveOfDistanceZero { x:  0, y: -1 } (Move Up    0)
+      testReturnsOriginIfMoveOfDistanceZero { x: -1, y: -1 } (Move Up    0)
+      testReturnsOriginIfMoveOfDistanceZero { x:  0, y:  0 } (Move Right 0)
+      testReturnsOriginIfMoveOfDistanceZero { x:  0, y:  1 } (Move Right 0)
+      testReturnsOriginIfMoveOfDistanceZero { x:  1, y:  0 } (Move Right 0)
+      testReturnsOriginIfMoveOfDistanceZero { x:  1, y:  1 } (Move Right 0)
+      testReturnsOriginIfMoveOfDistanceZero { x: -1, y:  0 } (Move Right 0)
+      testReturnsOriginIfMoveOfDistanceZero { x:  0, y: -1 } (Move Right 0)
+      testReturnsOriginIfMoveOfDistanceZero { x: -1, y: -1 } (Move Right 0)
+      testReturnsOriginIfMoveOfDistanceZero { x:  0, y:  0 } (Move Down  0)
+      testReturnsOriginIfMoveOfDistanceZero { x:  0, y:  1 } (Move Down  0)
+      testReturnsOriginIfMoveOfDistanceZero { x:  1, y:  0 } (Move Down  0)
+      testReturnsOriginIfMoveOfDistanceZero { x:  1, y:  1 } (Move Down  0)
+      testReturnsOriginIfMoveOfDistanceZero { x: -1, y:  0 } (Move Down  0)
+      testReturnsOriginIfMoveOfDistanceZero { x:  0, y: -1 } (Move Down  0)
+      testReturnsOriginIfMoveOfDistanceZero { x: -1, y: -1 } (Move Down  0)
+      testReturnsOriginIfMoveOfDistanceZero { x:  0, y:  0 } (Move Left  0)
+      testReturnsOriginIfMoveOfDistanceZero { x:  0, y:  1 } (Move Left  0)
+      testReturnsOriginIfMoveOfDistanceZero { x:  1, y:  0 } (Move Left  0)
+      testReturnsOriginIfMoveOfDistanceZero { x:  1, y:  1 } (Move Left  0)
+      testReturnsOriginIfMoveOfDistanceZero { x: -1, y:  0 } (Move Left  0)
+      testReturnsOriginIfMoveOfDistanceZero { x:  0, y: -1 } (Move Left  0)
+      testReturnsOriginIfMoveOfDistanceZero { x: -1, y: -1 } (Move Left  0)
 
-        (move (Move Left     1) { x:  0, y:  0 }) `shouldEqual` { x: -1, y:  0 }
-        (move (Move Left  (-1)) { x:  0, y:  0 }) `shouldEqual` { x:  1, y:  0 }
-        (move (Move Left     2) { x:  0, y:  0 }) `shouldEqual` { x: -2, y:  0 }
-        (move (Move Left     1) { x:  1, y:  2 }) `shouldEqual` { x:  0, y:  2 }
+      let testTranslatesOriginIfMove = (\origin step expectedPosition ->
+        it (
+          "translates origin if step is a Move with distance ≠ 0"
+          <> " (step: " <> show step <> ", origin: " <> show origin
+          <> ", expectedPosition: " <> show expectedPosition <> ")"
+        ) $ buildTestCase origin step expectedPosition
+      )
+
+      testTranslatesOriginIfMove { x:  0, y:  0 }  (Move Up      1)  { x:  0, y:  1 }
+      testTranslatesOriginIfMove { x:  0, y:  0 }  (Move Up   (-1))  { x:  0, y: -1 }
+      testTranslatesOriginIfMove { x:  0, y:  0 }  (Move Up      2)  { x:  0, y:  2 }
+      testTranslatesOriginIfMove { x:  1, y:  2 }  (Move Up      1)  { x:  1, y:  3 }
+      testTranslatesOriginIfMove { x:  0, y:  0 }  (Move Right    1)  { x:  1, y:  0 }
+      testTranslatesOriginIfMove { x:  0, y:  0 }  (Move Right (-1))  { x: -1, y:  0 }
+      testTranslatesOriginIfMove { x:  0, y:  0 }  (Move Right    2)  { x:  2, y:  0 }
+      testTranslatesOriginIfMove { x:  1, y:  2 }  (Move Right    1)  { x:  2, y:  2 }
+      testTranslatesOriginIfMove { x:  0, y:  0 }  (Move Down     1)  { x:  0, y: -1 }
+      testTranslatesOriginIfMove { x:  0, y:  0 }  (Move Down  (-1))  { x:  0, y:  1 }
+      testTranslatesOriginIfMove { x:  0, y:  0 }  (Move Down     2)  { x:  0, y: -2 }
+      testTranslatesOriginIfMove { x:  1, y:  2 }  (Move Down     1)  { x:  1, y:  1 }
+      testTranslatesOriginIfMove { x:  0, y:  0 }  (Move Left     1)  { x: -1, y:  0 }
+      testTranslatesOriginIfMove { x:  0, y:  0 }  (Move Left  (-1))  { x:  1, y:  0 }
+      testTranslatesOriginIfMove { x:  0, y:  0 }  (Move Left     2)  { x: -2, y:  0 }
+      testTranslatesOriginIfMove { x:  1, y:  2 }  (Move Left     1)  { x:  0, y:  2 }
 
     describe "updateRoverState" do
 
