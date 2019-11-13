@@ -7,6 +7,8 @@ You can edit this file as you like.
 , dependencies =
     [ "console"
     , "effect"
+    , "globals"
+    , "maybe"
     , "profunctor-lenses"
     , "psci-support"
     , "spec"
